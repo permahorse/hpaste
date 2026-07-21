@@ -23,13 +23,9 @@ class HasteBin(WebClipBoardBase):
         try:
             rep = request.urlopen(url, timeout=timeout)
         except URLError as e:
-            try:
-                import certifi
-                rep = request.urlopen(url, timeout=timeout, cafile=certifi.where())
-            except ImportError:
-                import ssl
-                rep = request.urlopen(url, timeout=timeout, context=ssl._create_unverified_context())
-                print("WARNING: connected with unverified context")
+            import certifi
+            import ssl
+            rep = request.urlopen(url, timeout=timeout, context=ssl.create_default_context(cafile=certifi.where()))
         return rep
 
     def webPackData(self, s):
