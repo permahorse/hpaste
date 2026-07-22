@@ -4,7 +4,10 @@ from urllib import request
 import hou
 
 from .nethelper import urlopen_nt
-from PySide2.QtWidgets import QMessageBox, QInputDialog
+try:
+    from PySide6.QtWidgets import QMessageBox, QInputDialog
+except ImportError:
+    from PySide2.QtWidgets import QMessageBox, QInputDialog
 from .QGithubDeviceAuthDialog import QGithubDeviceAuthDialog
 
 

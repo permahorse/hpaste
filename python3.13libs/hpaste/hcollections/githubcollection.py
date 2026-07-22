@@ -14,10 +14,14 @@ currentVersion = (1, 1)
 
 qtAvailable = False
 try:
-    from PySide2.QtGui import QPixmap
-    from PySide2.QtCore import QBuffer, QByteArray
-
-    qtAvailable = True
+    try:
+        from PySide6.QtGui import QPixmap
+        from PySide6.QtCore import QBuffer, QByteArray
+        qtAvailable = True
+    except ImportError:
+        from PySide2.QtGui import QPixmap
+        from PySide2.QtCore import QBuffer, QByteArray
+        qtAvailable = True
 except ImportError:
     pass
 

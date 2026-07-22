@@ -33,7 +33,8 @@ def urlopen_nt(req: request.Request, fallback_cert: int = 0) -> (int, object):
             rep = request.urlopen(req)
         elif fallback_cert == 1:
             import certifi
-            rep = request.urlopen(req, cafile=certifi.where())
+            import ssl
+            rep = request.urlopen(req, context=ssl.create_default_context(cafile=certifi.where()))
         elif fallback_cert == 2:
             import ssl
             rep = request.urlopen(req, context=ssl._create_unverified_context())

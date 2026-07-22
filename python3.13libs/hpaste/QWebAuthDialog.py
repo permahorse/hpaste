@@ -5,11 +5,13 @@ raise NotImplementedError()
 
 import re
 try:
+    from PySide6.QtWidgets import QDialog, QVBoxLayout
+    from PySide6.QtWebEngineWidgets import QWebEngineView
+    from PySide6.QtCore import QUrl
+except ImportError:
     from PySide2.QtWidgets import QDialog, QVBoxLayout
     from PySide2.QtWebEngineWidgets import QWebEngineView
     from PySide2.QtCore import QUrl
-except ImportError:
-    raise NotImplementedError('web auth implemented only for QT5. Sorry, people who still use houdini 16.5')
 
 
 class QWebAuthDialog(QDialog):

@@ -3,11 +3,14 @@ import json
 from urllib import request
 from .nethelper import urlopen_nt
 try:
+    from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QSizePolicy, QPushButton, QMessageBox
+    from PySide6.QtWebEngineWidgets import QWebEngineView
+    from PySide6.QtWebEngineCore import QWebEngineProfile, QWebEnginePage
+    from PySide6.QtCore import Slot, Qt, QUrl
+except ImportError:
     from PySide2.QtWidgets import QDialog, QVBoxLayout, QLabel, QSizePolicy, QPushButton, QMessageBox
     from PySide2.QtWebEngineWidgets import QWebEngineView, QWebEngineProfile, QWebEnginePage
     from PySide2.QtCore import Slot, Qt, QUrl
-except ImportError:
-    raise NotImplementedError('web auth implemented only for QT5. Sorry, people who still use houdini 16.5. You will have to create access token manually. contact me to ask how.')
 
 import time
 

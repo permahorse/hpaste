@@ -1,5 +1,8 @@
 
-from PySide2.QtWidgets import *
+try:
+    from PySide6.QtWidgets import *
+except ImportError:
+    from PySide2.QtWidgets import *
 
 class QDoubleInputDialog(QDialog):
     def __init__(self,parent=None):

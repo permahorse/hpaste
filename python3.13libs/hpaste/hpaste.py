@@ -112,7 +112,7 @@ def getSerializer(enctype: Optional[str] = None, **kwargs) -> Tuple[Optional[dic
         if not crypto_available:
             raise RuntimeError('PyCrypto is not available, cannot encrypt/decrypt')
         rng = CRandom.new()
-        key = kwargs['key']
+        key = kwargs['key'].encode('UTF-8')
         mode = kwargs.get('mode', AES.MODE_CBC)
         iv = kwargs.get('iv', rng.read(AES.block_size))
         magic_footer = (b'--===E)*(3===--.' * (AES.block_size // 16 + int(AES.block_size % 16 > 0)))[:AES.block_size]
@@ -136,7 +136,7 @@ def getDeserializer(enctype: Optional[str] = None, **kwargs) -> Callable[[bytes]
     if enctype == 'AES':
         if not crypto_available:
             raise RuntimeError('PyCrypto is not available, cannot encrypt/decrypt')
-        key = kwargs['key']
+        key = kwargs['key'].encode('UTF-8')
         if key is None:
             raise NoKeyError('no decryption key provided for encryption type AES')
         mode = kwargs['mode']

@@ -1,21 +1,21 @@
 import hou
 
-from PySide2.QtCore import Slot, QSortFilterProxyModel, QRegExp, Qt
-from PySide2.QtWidgets import QInputDialog, QMessageBox
+from PySide6.QtCore import Slot, QSortFilterProxyModel, QRegularExpression, Qt
+from PySide6.QtWidgets import QInputDialog, QMessageBox
 
-from . import hpaste
-from .hcollections.collectionwidget import CollectionWidget
-from .hcollections.collectionbase import CollectionSyncError, CollectionItem
-from .hcollections.githubcollection import GithubCollection
-from .hcollections.QDoubleInputDialog import QDoubleInputDialog
+from .. import hpaste
+from ..hcollections.collectionwidget import CollectionWidget
+from ..hcollections.collectionbase import CollectionSyncError, CollectionItem
+from ..hcollections.githubcollection import GithubCollection
+from ..hcollections.QDoubleInputDialog import QDoubleInputDialog
 
-from .logger import defaultLogger as log
+from ..logger import defaultLogger as log
 
 from urllib import error  # just for exception catching
 
 # TODO: implement some kind of collection rescan
 
-from .githubauthorizator import GithubAuthorizator
+from ..githubauthorizator import GithubAuthorizator
 
 
 class HPasteCollectionWidget(object):
@@ -30,7 +30,7 @@ class HPasteCollectionWidget(object):
 
             self.__nettypeFilter = QSortFilterProxyModel(self)
             self.__nettypeFilter.setFilterKeyColumn(4)
-            self.__nettypeFilter.setFilterRegExp(QRegExp("*", Qt.CaseInsensitive, QRegExp.Wildcard))
+            self.__nettypeFilter.setFilterRegularExpression(QRegularExpression(".*", QRegularExpression.PatternOption.CaseInsensitiveOption))
             self.appendFilter(self.__nettypeFilter)
 
             self.accepted.connect(self.doOnAccept)
@@ -51,12 +51,12 @@ class HPasteCollectionWidget(object):
             self.__savedNetworkViewPos = pane.cursorPosition()
 
             if pane is None:
-                nettype = '*'
+                nettype = '.*'
                 self.__netType = ''  # Used to create new snippet types
             else:
                 nettype = hpaste.getChildContext(pane.pwd(), hou.applicationVersion())
                 self.__netType = nettype
-            self.__nettypeFilter.setFilterRegExp(QRegExp(nettype, Qt.CaseInsensitive, QRegExp.Wildcard))
+            self.__nettypeFilter.setFilterRegularExpression(QRegularExpression(nettype, QRegularExpression.PatternOption.CaseInsensitiveOption))
 
         @Slot(object)
         def doOnAccept(self, item):
