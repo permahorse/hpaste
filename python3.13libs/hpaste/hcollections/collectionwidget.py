@@ -20,7 +20,7 @@ class CollectionListerThread(QThread):
 
     def __init__(self, collection, parent=None):
         assert isinstance(collection, collectionbase.CollectionBase), 'collection must be a collection'
-        super(CollectionListerThread, self).__init__(parent)
+        super().__init__(parent)
         self.__collection = collection
         self.__stopMutex = QMutex()
         self.__skip = False
@@ -71,7 +71,7 @@ class SnippetCollectionModel(QAbstractTableModel):
     def __init__(self, collectionsList, parent=None, metadataExposedKeys=()):
         assert isinstance(metadataExposedKeys, list) or isinstance(metadataExposedKeys, tuple), 'metadataExposeKeys should be a collection of string keys'
 
-        super(SnippetCollectionModel, self).__init__(parent)
+        super().__init__(parent)
         self.__collections = list(collectionsList)
         self.__itemList = []  # This list should be 1-to-1 corresponding to model's rows
 
@@ -308,7 +308,7 @@ class SnippetCollectionModel(QAbstractTableModel):
 
 class ScalingImageStyledItemDelegate(QStyledItemDelegate):
     def sizeHint(self, option, index):
-        size = super(ScalingImageStyledItemDelegate, self).sizeHint(option, index)
+        size = super().sizeHint(option, index)
         if index.data(Qt.UserRole) is not None:
             size += QSize(size.height(), 0)
         return size
@@ -327,12 +327,12 @@ class ScalingImageStyledItemDelegate(QStyledItemDelegate):
 
             option.rect.adjust(msize, 0, 0, 0)
 
-        super(ScalingImageStyledItemDelegate, self).paint(painter, option, index)
+        super().paint(painter, option, index)
 
 
 class CollectionWidget(QDropdownWidget):
     def __init__(self, parent=None, metadataExposedKeys=()):
-        super(CollectionWidget, self).__init__(parent)
+        super().__init__(parent)
         self.setProperty("houdiniStyle", True)  # for some unknown reason it works only if it's here or higher. TODO: find out why, move to hpastecollectionwidget
         self.setModel(SnippetCollectionModel([], self, metadataExposedKeys))
 
@@ -379,7 +379,7 @@ class CollectionWidget(QDropdownWidget):
 
     @Slot(str)
     def filterTable(self, filtername):
-        super(CollectionWidget, self).filterTable(filtername)
+        super().filterTable(filtername)
         self.sort(0)
 
     def _addItem(self, collection):
@@ -500,36 +500,3 @@ class CollectionWidget(QDropdownWidget):
         menu.popup(self.mapToGlobal(pos))
         menu.aboutToHide.connect(menu.deleteLater)
         return menu  # Slot does not need that, but if subclass overrides - it can modify default menu instead of creating one from ground up
-
-
-####TESTING
-if __name__ == '__main__':
-    class FakeCollection(collectionbase.CollectionBase):
-        def __init__(self):
-            super(FakeCollection, self).__init__()
-            self.__coll = [collectionbase.CollectionItem(self, 'item %s' % x, 'fat %s' % (x * 2), 'testnoid', x % 2, x % 4 < 2, metadata={'raw_url': 'https://fork', 'nettype': 'WOOF'}) for x in range(100)]
-
-        def name(self):
-            return 'testname'
-
-        def list(self):
-            return self.__coll
-
-        def removeItem(self, item):
-            self.__coll.remove(item)
-            item.invalidate()
-
-
-    import sys
-
-    qapp = QApplication(sys.argv)
-
-    col = FakeCollection()
-
-    wid = CollectionWidget(metadataExposedKeys=('raw_url', 'nettype'))
-    wid.move(800, 400)
-    wid.addCollection(col)
-    wid.accepted.connect(lambda x: log('dialog accepted "%s"' % x.name()))
-    wid.finished.connect(lambda: qapp.quit())
-    wid.show()
-    sys.exit(qapp.exec_())

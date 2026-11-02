@@ -72,7 +72,7 @@ class QDropdownWidget(QWidget):
         self.ui.mainLayout.setContentsMargins(0, 0, 0, 0)
         self.ui.mainLayout.setSpacing(2)
         self.ui.mainLayout.setSizeConstraint(QLayout.SetMinimumSize)
-        self.ui.mainView = QAdjustedTableView(self)
+        self.ui.mainView = QAdjustedTableView()
         self.ui.mainView.horizontalHeader().hide()
         self.ui.mainView.verticalHeader().hide()
 
@@ -90,7 +90,7 @@ class QDropdownWidget(QWidget):
         self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
         # self.resize(128,512)
-        self.setWindowFlags(Qt.Popup)
+        self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
 
         self.__model = None
         self.__proxyModel = QSortFilterProxyModel(self)

@@ -18,10 +18,10 @@ from urllib import error  # just for exception catching
 from ..githubauthorizator import GithubAuthorizator
 
 
-class HPasteCollectionWidget(object):
+class HPasteCollectionWidget:
     class __HPasteCollectionWidget(CollectionWidget):
         def __init__(self, parent=None):
-            super(HPasteCollectionWidget.__HPasteCollectionWidget, self).__init__(parent, metadataExposedKeys=('raw_url', 'nettype'))
+            super().__init__(parent, metadataExposedKeys=('raw_url', 'nettype'))
             for x in range(1, 5):
                 self.ui.mainView.horizontalHeader().hideSection(x)
 
@@ -90,12 +90,9 @@ class HPasteCollectionWidget(object):
                     return
 
                 if len(name) > 0:
-                    break;  # validity check
+                    break  # validity check
 
             try:
-                # print(name)
-                # print(desc)
-                # print(hpaste.nodesToString(nodes))
                 self.model().addItemToCollection(collection, name, desc, hpaste.nodesToString(nodes), public, metadata={'nettype': self.__netType})
             except CollectionSyncError as e:
                 QMessageBox.critical(self, 'something went wrong!', 'Server error occured: %s' % str(e))
@@ -151,7 +148,7 @@ class HPasteCollectionWidget(object):
         def _removeIcon(self, index):
             ok = QMessageBox.warning(self, 'sure?', 'confirm removing Icon. This operation can not be undone.', QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok
             if ok:
-                super(HPasteCollectionWidget.__HPasteCollectionWidget, self)._removeIcon(index)
+                super()._removeIcon(index)
 
         def _confirmRemove(self, index):
             return QMessageBox.warning(self, 'sure?', 'confirm removing the item from collection. This operation can not be undone.', QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok
