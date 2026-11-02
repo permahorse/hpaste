@@ -7,6 +7,10 @@ for simple and fast exchange of node packs through any messenger
 
 **HCollections** should work in **Houdini 22.0, 21.0, 20.5, 20.0, 19.5, 19.0, 18.5, 18.0, 17.x, 16.x, 15.5** with both Qt4 and Qt5  
 
+> [!WARNING]
+   Houdini 22 broke QT event delivery, so HCollection widgets do not work properly. A hotfix was published to `master` branch to restore base functionality,
+   but some keys still don't work.
+
 > [!NOTE]
    Latest releases and master branch have **dropped** python 2.7, python <3.9 and QT4 compatibility. Use older releases if you require QT4 or python 2.7 or <3.9
 
