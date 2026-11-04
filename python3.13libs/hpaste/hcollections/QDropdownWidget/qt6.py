@@ -49,8 +49,15 @@ class QFocusedLineEdit(QLineEdit):
         event.accept()
 
     def keyPressEvent(self, event):
-        if self.parent() is not None and event.key() == Qt.Key_Up or event.key() == Qt.Key_Down:
-            event.ignore()  # let it be processed by parent
+        if self.parent() is not None and event.key() in (
+                Qt.Key_Up,
+                Qt.Key_Down,
+                Qt.Key_Return,
+                Qt.Key_Enter,
+                Qt.Key_Escape,
+        ):
+            # pass to parent. event.ignore() should do the same, but it's broken in h22
+            self.parent().keyPressEvent(event)
         else:
             super(QFocusedLineEdit, self).keyPressEvent(event)
 
@@ -221,7 +228,7 @@ class QDropdownWidget(QWidget):
             cid = self.ui.mainView.currentIndex()
             if cid.row() < self.__proxyModel.rowCount() - 1:
                 self.ui.mainView.setCurrentIndex(self.__proxyModel.index(cid.row() + 1, cid.column()))
-        elif event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
+        elif event.key() in (Qt.Key_Return, Qt.Key_Enter):
             self.accept()
         elif event.key() == Qt.Key_Escape:
             self.hide()
