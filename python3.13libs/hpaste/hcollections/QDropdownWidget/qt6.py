@@ -1,11 +1,5 @@
-try:
-    from PySide6.QtCore import *
-    from PySide6.QtWidgets import *
-    from PySide6.QtGui import *
-except ImportError:
-    from PySide2.QtCore import *
-    from PySide2.QtWidgets import *
-    from PySide2.QtGui import *
+from PySide6.QtCore import Signal, Slot, QEvent, QRegularExpression, QSize, QSortFilterProxyModel, Qt
+from PySide6.QtWidgets import QAbstractItemView, QHeaderView, QLayout, QLineEdit, QSizePolicy, QTableView, QVBoxLayout, QWidget
 
 import re
 
@@ -25,8 +19,8 @@ class QAdjustedTableView(QTableView):
 
     def mouseDoubleClickEvent(self, event):
         event.accept()
-        if self.parent() is not None:
-            self.parent().accept()
+        if (parent := self.parent()) is not None:
+            parent.accept()
 
     # ### QT
     def sizeHint(self):
@@ -49,8 +43,15 @@ class QFocusedLineEdit(QLineEdit):
         event.accept()
 
     def keyPressEvent(self, event):
-        if self.parent() is not None and event.key() == Qt.Key_Up or event.key() == Qt.Key_Down:
-            event.ignore()  # let it be processed by parent
+        if self.parent() is not None and event.key() in (
+                Qt.Key.Key_Up,
+                Qt.Key.Key_Down,
+                Qt.Key.Key_Return,
+                Qt.Key.Key_Enter,
+                Qt.Key.Key_Escape,
+        ):
+            # pass to parent. event.ignore() should do the same, but it's broken in h22
+            self.parent().keyPressEvent(event)
         else:
             super(QFocusedLineEdit, self).keyPressEvent(event)
 
@@ -71,26 +72,23 @@ class QDropdownWidget(QWidget):
         self.ui.mainLayout = QVBoxLayout(self)
         self.ui.mainLayout.setContentsMargins(0, 0, 0, 0)
         self.ui.mainLayout.setSpacing(2)
-        self.ui.mainLayout.setSizeConstraint(QLayout.SetMinimumSize)
+        self.ui.mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)
         self.ui.mainView = QAdjustedTableView()
         self.ui.mainView.horizontalHeader().hide()
         self.ui.mainView.verticalHeader().hide()
 
-        try:  # qt5
-            self.ui.mainView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        except:  # qt4
-            self.ui.mainView.horizontalHeader().setResizeMode(QHeaderView.Stretch)
+        self.ui.mainView.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
         self.ui.mainView.setMinimumSize(128, 32)
         self.setMinimumSize(32, 32)
 
-        self.ui.mainView.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-        self.ui.mainView.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.ui.mainView.setSelectionBehavior(QAbstractItemView.SelectItems)
-        self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.ui.mainView.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        self.ui.mainView.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.ui.mainView.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectItems)
+        self.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
 
         # self.resize(128,512)
-        self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowType.Window | Qt.WindowType.FramelessWindowHint)
 
         self.__model = None
         self.__proxyModel = QSortFilterProxyModel(self)
@@ -101,7 +99,7 @@ class QDropdownWidget(QWidget):
 
         self.ui.nameInput = QFocusedLineEdit(self)
         self.ui.nameInput.setMinimumSize(32, 24)
-        self.ui.nameInput.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        self.ui.nameInput.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
 
         self.ui.mainLayout.addWidget(self.ui.nameInput)
         self.ui.mainLayout.addWidget(self.ui.mainView)
@@ -125,6 +123,7 @@ class QDropdownWidget(QWidget):
         self.__proxyModel.setSourceModel(filter)
 
         self.__filterList.append(filter)
+        return True
 
     # Todo: implement insertFilter or smth
 
@@ -180,12 +179,8 @@ class QDropdownWidget(QWidget):
         else:
             self.__proxyModel.setSourceModel(self.__model)
 
-    # def _proxyModel(self):
-    #    return self.__proxyModel
-
     @Slot()
     def resizeToTable(self):
-
         # hgt=self.ui.mainView.verticalHeader().length()
         # self.resize(self.size().width(),hgt+32)
         self.adjustSize()
@@ -213,17 +208,17 @@ class QDropdownWidget(QWidget):
         self.accepted.emit(self._mapToSource(self.ui.mainView.currentIndex()).internalPointer())
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Up:
+        if event.key() == Qt.Key.Key_Up:
             cid = self.ui.mainView.currentIndex()
             if cid.row() > 0:
                 self.ui.mainView.setCurrentIndex(self.__proxyModel.index(cid.row() - 1, cid.column()))
-        elif event.key() == Qt.Key_Down:
+        elif event.key() == Qt.Key.Key_Down:
             cid = self.ui.mainView.currentIndex()
             if cid.row() < self.__proxyModel.rowCount() - 1:
                 self.ui.mainView.setCurrentIndex(self.__proxyModel.index(cid.row() + 1, cid.column()))
-        elif event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
+        elif event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.accept()
-        elif event.key() == Qt.Key_Escape:
+        elif event.key() == Qt.Key.Key_Escape:
             self.hide()
         event.accept()
 
